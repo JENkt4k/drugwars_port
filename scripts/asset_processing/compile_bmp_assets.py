@@ -69,7 +69,14 @@ def encode_asset(path, target, colors=8, render_scale=2):
     )
 
     raw_palette = q.getpalette()
-    used = sorted(set(q.getdata()))
+    # Pillow 14 deprecates Image.getdata(); get_flattened_data() is the
+    # forward-compatible equivalent while older Pillow versions still use
+    # getdata(). Keep both so the build works across environments.
+    if hasattr(q, "get_flattened_data"):
+        pixel_values = q.get_flattened_data()
+    else:
+        pixel_values = q.getdata()
+    used = sorted(set(pixel_values))
     remap = {old: i for i, old in enumerate(used)}
     palette = tuple(
         tuple(raw_palette[i * 3:i * 3 + 3])
