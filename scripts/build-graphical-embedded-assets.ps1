@@ -31,10 +31,23 @@ if ($LASTEXITCODE -ne 0) {
     throw "Asset compiler failed with exit code $LASTEXITCODE"
 }
 
-$GeneratedRelative = [System.IO.Path]::GetRelativePath($Root, $Generated)
+# Windows PowerShell 5.1 / older .NET Framework does not provide
+# System.IO.Path.GetRelativePath(). Convert the generated path to a
+# repository-relative path using GetFullPath + Substring instead.
+$RootFull = [System.IO.Path]::GetFullPath($Root).TrimEnd('\')
+$GeneratedFull = [System.IO.Path]::GetFullPath($Generated)
+$Prefix = $RootFull + '\'
+
+if (-not $GeneratedFull.StartsWith($Prefix, [System.StringComparison]::OrdinalIgnoreCase)) {
+    throw "Generated source is outside repository root: $GeneratedFull"
+}
+
+$GeneratedRelative = $GeneratedFull.Substring($Prefix.Length)
 
 Write-Host ""
 Write-Host "Building generated Python through existing Luna pipeline..."
+Write-Host "  Source: $GeneratedRelative"
+Write-Host "  Output: $Output"
 & $BuildScript `
     -Source $GeneratedRelative `
     -Output $Output
