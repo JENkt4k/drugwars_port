@@ -1,5 +1,7 @@
 # Drug Wars for TI-Nspire CX II
 
+_Image contains AI design that excludes names and elicit content. It does not match the historical game or any of its original source. The design is intended to illustrate the graphical Python port of Drug Wars for TI-Nspire CX II._
+
 ![Drug Wars example screens](images/design/example_screens.png)
 
 A TI-Nspire CX II / CX II CAS port of the classic calculator game **Drug Wars**, with both text-shell and full-screen graphical Python implementations.
