@@ -9,6 +9,18 @@
 
 from random import randint
 
+# TI-Nspire Python Shell can only show rows 0..11 at once.
+# Use the calculator's native shell clear when available.
+try:
+    from ti_system import disp_clr
+except:
+    def disp_clr():
+        # Desktop/testing fallback.
+        print("\n" * 12)
+
+def clear_screen():
+    disp_clr()
+
 DRUGS = ["Cocaine", "Heroin", "Acid", "Weed", "Speed", "Ludes"]
 COKE, HEROIN, ACID, WEED, SPEED, LUDES = range(6)
 
@@ -62,6 +74,7 @@ class Game:
 
         self.dead = False
         self.finished = False
+        self.quit_early = False
 
     def used_space(self):
         # Guns consume five coat slots in the original game.
@@ -71,7 +84,7 @@ class Game:
         return self.capacity - self.used_space()
 
     def show_title(self):
-        print("")
+        clear_screen()
         print("==============================")
         print("       J.M.'S DRUGWAR")
         print("        SIMULATION 2.00")
@@ -338,26 +351,23 @@ class Game:
                 pause()
 
     def show_prices(self):
-        print("")
+        # Keep this to <= 11 shell rows so nothing scrolls off-screen.
+        clear_screen()
         print("DAY", self.day, "-", LOCATIONS[self.location])
-        print("------------------------------")
+        print("----------------------------")
         for i in range(6):
-            print(str(i + 1) + ".", DRUGS[i],
-                  money(self.prices[i]))
-        print("------------------------------")
-        print("Wallet:", money(self.cash))
-        print("Debt  :", money(self.debt))
-        print("Bank  :", money(self.bank))
+            print(str(i + 1) + ".", DRUGS[i], money(self.prices[i]))
+        print("Cash", money(self.cash), "Debt", money(self.debt))
+        print("Bank", money(self.bank), "Free", self.free_space())
 
     def show_coat(self):
-        print("")
-        print("===== TRENCHCOAT =====")
+        clear_screen()
+        print("TRENCHCOAT  Free:", self.free_space())
+        print("----------------------------")
         for i in range(6):
             print(str(i + 1) + ".", DRUGS[i], self.inv[i])
-        print("Guns:", self.guns, "(5 spaces each)")
+        print("Guns:", self.guns, " Damage:", self.damage)
         print("Capacity:", self.capacity)
-        print("Free space:", self.free_space())
-        print("Damage:", self.damage)
         pause()
 
     def choose_drug(self, prompt):
@@ -410,8 +420,8 @@ class Game:
         self.cash += qty * self.prices[d]
 
     def travel(self):
-        print("")
-        print("===== WHERE TO, DUDE? =====")
+        clear_screen()
+        print("WHERE TO?")
         for i in range(len(LOCATIONS)):
             print(str(i + 1) + ".", LOCATIONS[i])
         print("0. Stay here")
@@ -457,7 +467,7 @@ class Game:
             return
 
         while True:
-            print("")
+            clear_screen()
             print("===== LOAN SHARK =====")
             print("Debt:", money(self.debt))
             print("Cash:", money(self.cash))
@@ -492,7 +502,7 @@ class Game:
             return
 
         while True:
-            print("")
+            clear_screen()
             print("===== BANK =====")
             print("Account:", money(self.bank))
             print("Wallet :", money(self.cash))
@@ -526,6 +536,7 @@ class Game:
                     print("Invalid amount.")
 
     def score(self):
+        clear_screen()
         net = self.bank + self.cash - self.debt
 
         if net < 0:
@@ -553,19 +564,16 @@ class Game:
 
     def main_menu(self):
         while not self.finished:
-            print("")
-            print("==============================")
-            print("DRUGWAR!  DAY", self.day, "/ 30")
-            print(LOCATIONS[self.location])
-            print("==============================")
-            print("1. See prices")
-            print("2. Trenchcoat")
-            print("3. Buy")
-            print("4. Sell")
-            print("5. Jet")
-            print("6. See loan shark")
-            print("7. Visit bank")
-            print("0. Status")
+            clear_screen()
+            print("DRUGWAR  Day", self.day, "/30")
+            print(LOCATIONS[self.location],
+                  " Cash:", money(self.cash))
+            print("----------------------------")
+            print("1 Prices    2 Coat")
+            print("3 Buy       4 Sell")
+            print("5 Jet       6 Loan shark")
+            print("7 Bank      0 Status")
+            print("8 QUIT GAME")
 
             c = ask_int("> ")
 
@@ -585,11 +593,23 @@ class Game:
             elif c == 7:
                 self.bank_menu()
             elif c == 0:
-                self.show_prices()
+                clear_screen()
+                print("===== STATUS =====")
+                print("Day:", self.day, "/ 30")
+                print("Location:", LOCATIONS[self.location])
+                print("Cash:", money(self.cash))
+                print("Debt:", money(self.debt))
+                print("Bank:", money(self.bank))
                 print("Free space:", self.free_space())
                 print("Guns:", self.guns)
-                print("Damage:", self.damage)
+                print("Damage:", self.damage, "/ 50")
                 pause()
+            elif c == 8:
+                clear_screen()
+                if yes_no("QUIT THIS GAME?"):
+                    self.quit_early = True
+                    self.finished = True
+                    return
 
     def run(self):
         self.show_title()
@@ -601,12 +621,14 @@ class Game:
         if not self.finished:
             self.main_menu()
 
-        self.score()
+        if not self.quit_early:
+            self.score()
 
 def play():
     while True:
         g = Game()
         g.run()
+        clear_screen()
         if not yes_no("PLAY AGAIN?"):
             print("")
             print("THANKS FOR PLAYING!")
