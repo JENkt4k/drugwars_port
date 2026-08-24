@@ -94,21 +94,45 @@ class Game:
         print("")
 
     def instructions(self):
+        clear_screen()
+        print("HOW TO PLAY (1/3)")
+        print("")
         print("Buy low and sell high.")
-        print("You begin with $2000 and $5000 debt.")
-        print("You have 30 days to pay the debt")
-        print("and make as much money as possible.")
         print("")
-        print("Normal price ranges:")
-        print("Cocaine : $16000-$28000")
-        print("Heroin  :  $5000-$12000")
-        print("Acid    :  $1000-$4400")
-        print("Weed    :    $330-$750")
-        print("Speed   :     $70-$220")
-        print("Ludes   :     $10-$50")
+        print("Start:")
+        print("Cash: $2000")
+        print("Debt: $5000")
         print("")
-        print("Police become a danger when you")
-        print("carry a large inventory.")
+        print("You have 30 days to pay")
+        print("your debt and make as much")
+        print("money as possible.")
+        pause()
+
+        clear_screen()
+        print("HOW TO PLAY (2/3)")
+        print("")
+        print("NORMAL PRICE RANGES")
+        print("")
+        print("Cocaine $16000-$28000")
+        print("Heroin   $5000-$12000")
+        print("Acid     $1000-$4400")
+        print("Weed       $330-$750")
+        print("Speed       $70-$220")
+        print("Ludes        $10-$50")
+        pause()
+
+        clear_screen()
+        print("HOW TO PLAY (3/3)")
+        print("")
+        print("Your trenchcoat holds")
+        print("100 units.")
+        print("")
+        print("Guns use 5 spaces.")
+        print("")
+        print("Police may chase you when")
+        print("carrying lots of drugs.")
+        print("Debt +10% per trip.")
+        print("Bank +6% per trip.")
         pause()
 
     def roll_prices(self):
@@ -124,43 +148,46 @@ class Game:
         event = randint(0, 20)
         self.random_event(event)
 
+    def event_screen(self):
+        clear_screen()
+
     def random_event(self, event):
         if event == 1:
-            print("")
+            self.event_screen()
             print("RIVAL DEALERS ARE SELLING")
             print("CHEAP LUDES!")
             self.prices[LUDES] = 2
             pause()
 
         elif event == 2:
-            print("")
+            self.event_screen()
             print("WEED PRICES HAVE BOTTOMED OUT!")
             self.prices[WEED] = 122
             pause()
 
         elif event == 3:
-            print("")
+            self.event_screen()
             print("POLICE ARE SELLING CHEAP HEROIN")
             print("FROM LAST WEEK'S RAID!")
             self.prices[HEROIN] = randint(850, 2000)
             pause()
 
         elif event == 4 or event == 5:
-            print("")
+            self.event_screen()
             print("ADDICTS ARE BUYING HEROIN")
             print("AT OUTRAGEOUS PRICES!")
             self.prices[HEROIN] = randint(18000, 43000)
             pause()
 
         elif event == 6 or event == 7:
-            print("")
+            self.event_screen()
             print("POLICE MADE A BIG COKE BUST!")
             print("PRICES ARE OUTRAGEOUS!")
             self.prices[COKE] = randint(80000, 140000)
             pause()
 
         elif event == 8:
-            print("")
+            self.event_screen()
             print("YOU WERE MUGGED IN THE SUBWAY!")
             # Original keeps approximately two thirds of wallet.
             self.cash = (self.cash // 3) * 2
@@ -171,7 +198,7 @@ class Game:
             self.gun_offer()
 
         elif event == 14:
-            print("")
+            self.event_screen()
             print("THERE'S SOME WEED HERE THAT")
             print("SMELLS LIKE GOOD STUFF.")
             if yes_no("SMOKE IT?"):
@@ -187,7 +214,7 @@ class Game:
 
         elif event == 15:
             if self.cash >= 300:
-                print("")
+                self.event_screen()
                 print("BUY A NEW TRENCHCOAT WITH")
                 print("MORE POCKETS FOR $200?")
                 if yes_no("BUY COAT?"):
@@ -201,14 +228,14 @@ class Game:
                 amount = randint(1, 7)
                 which = randint(0, 5)
                 self.inv[which] += amount
-                print("")
+                self.event_screen()
                 print("YOU FOUND", amount, "UNITS OF")
                 print(DRUGS[which].upper())
                 print("ON A DEAD DUDE IN THE SUBWAY!")
                 pause()
 
         elif event == 17:
-            print("")
+            self.event_screen()
             print("THE MARKET HAS BEEN FLOODED")
             print("WITH CHEAP HOMEMADE ACID!")
             self.prices[ACID] = randint(250, 799)
@@ -230,6 +257,7 @@ class Game:
         if self.cash < 500 or self.free_space() < 5:
             return
 
+        self.event_screen()
         guns = ["BERETTA", "SATURDAY NIGHT SPECIAL", ".44 MAGNUM"]
         gun_name = guns[randint(0, 2)]
 
@@ -245,6 +273,7 @@ class Game:
             pause()
 
     def police_chase(self, deputies):
+        clear_screen()
         # The BASIC stores deputies separately and treats Officer Hardass
         # as one additional pursuer.
         enemies = deputies + 1
@@ -255,7 +284,7 @@ class Game:
         pause()
 
         while enemies > 0 and not self.finished:
-            print("")
+            clear_screen()
             print("===== BEING CHASED =====")
             print("1. View guns")
             print("2. View damage")
@@ -311,7 +340,7 @@ class Game:
                     return
 
     def police_fire(self):
-        print("")
+        clear_screen()
         print("THEY'RE FIRING AT YOU!")
 
         if randint(0, 1) == 0:
@@ -334,7 +363,7 @@ class Game:
         return False
 
     def police_victory(self):
-        print("")
+        clear_screen()
         print("YOU KILLED ALL OF THEM!")
         loot = randint(750, 1999)
         self.cash += loot
@@ -440,7 +469,7 @@ class Game:
 
         self.location = dest
 
-        print("")
+        clear_screen()
         print("          SUBWAY")
         print("")
 
